@@ -30,17 +30,18 @@ const databaseConnection = async () => {
   }
 };
 
-functions.cloudEvent("userCreated", async (cloudEvent) => {
+functions.http("userCreated", async (req, res) => {
   try {
     console.log("Inside the cloud function");
     // Establish database connection
     const sequelizeInstance = await databaseConnection();
     if (!sequelizeInstance) {
       console.error("Database connection failed. Exiting function.");
+      res.status(400).send();
       return;
     }
 
-    const dataBuffer = cloudEvent.data.message.data;
+    const dataBuffer = req.body.message.data;
     console.log("dataBuffer:", dataBuffer);
 
     const base64 = Buffer.from(dataBuffer, "base64").toString();
@@ -65,6 +66,8 @@ functions.cloudEvent("userCreated", async (cloudEvent) => {
     mg.messages().send(data, async (error, body) => {
       if (error) {
         console.error("Error sending verification email:", error);
+        res.status(400).send();
+        return;
       } else {
         console.log("Verification link emailed:", body);
         try {
@@ -85,16 +88,24 @@ functions.cloudEvent("userCreated", async (cloudEvent) => {
                 "Insertion into the userVerifications table successful:",
                 result
               );
+              res.status(200).send();
+              return;
             });
         } catch (error) {
           console.error(
             "Error inserting data into the userVerifications table:",
             error
           );
+          res.status(400).send();
+          return;
         }
       }
     });
   } catch (error) {
     console.error("Error processing CloudEvent:", error);
+    res.status(400).send();
   }
 });
+
+
+
