@@ -1,9 +1,8 @@
 const functions = require("@google-cloud/functions-framework");
 const mailgun = require("mailgun-js");
-const DOMAIN = "webapp.payalkhatri.me";
 const mg = mailgun({
-  apiKey: "538d2360c00d5b149d150120c647a7fc-309b0ef4-ea9b4906",
-  domain: DOMAIN,
+  apiKey: process.env.MAILGUN_APIKEY,
+  domain: process.env.MAILGUN_DOMAIN,
 });
 const Sequelize = require("sequelize").Sequelize;
 const QueryTypes = require("sequelize").Sequelize;
@@ -52,7 +51,7 @@ functions.http("userCreated", async (req, res) => {
     // Generate a unique verification token
     const token = uuid.v4();
 
-    const verificationLink = `http://payalkhatri.me:3001/v1/user/verifyUser?token=${token}`;
+    const verificationLink = `https://payalkhatri.me/v1/user/verifyUser?token=${token}`;
 
     const data = {
       from: "Mailgun Sandbox <postmaster@webapp.payalkhatri.me>",
@@ -106,6 +105,5 @@ functions.http("userCreated", async (req, res) => {
     res.status(400).send();
   }
 });
-
 
 
