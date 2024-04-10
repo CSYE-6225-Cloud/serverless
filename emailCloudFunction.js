@@ -47,11 +47,12 @@ functions.http("userCreated", async (req, res) => {
     console.log("base64:", base64);
     const payload = JSON.parse(base64);
     const userEmail = payload.username;
+    const version = payload.version;
 
     // Generate a unique verification token
     const token = uuid.v4();
 
-    const verificationLink = `https://payalkhatri.me/v1/user/verifyUser?token=${token}`;
+    const verificationLink = `https://payalkhatri.me/${version}/user/verifyUser?token=${token}`;
 
     const data = {
       from: "Mailgun Sandbox <postmaster@webapp.payalkhatri.me>",
